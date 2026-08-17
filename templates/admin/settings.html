@@ -1,0 +1,51 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'settings' %}
+{% block admin_title %}Settings{% endblock %}
+{% block admin_content %}
+
+<div class="form-card">
+  <h2>SEO Settings</h2>
+  <form method="POST" action="{{ url_for('admin_settings') }}" class="admin-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="update_seo">
+    <div class="field">
+      <label for="site_title">Site Title</label>
+      <input type="text" id="site_title" name="site_title" value="{{ settings.get('site_title','') }}">
+    </div>
+    <div class="field">
+      <label for="meta_description">Meta Description</label>
+      <textarea id="meta_description" name="meta_description" rows="3">{{ settings.get('meta_description','') }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+  </form>
+</div>
+
+<div class="form-card">
+  <h2>Change Password</h2>
+  <form method="POST" action="{{ url_for('admin_settings') }}" class="admin-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="action" value="change_password">
+    <div class="form-grid">
+      <div class="field">
+        <label for="current_password">Current Password</label>
+        <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="new_password">New Password</label>
+        <input type="password" id="new_password" name="new_password" required minlength="8" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label for="confirm_password">Confirm New Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" required minlength="8" autocomplete="new-password">
+      </div>
+    </div>
+    <p class="field-hint">Minimum 8 characters.</p>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Update Password</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

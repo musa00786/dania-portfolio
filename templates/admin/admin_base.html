@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block bodyattrs %} class="admin"{% endblock %}
+{% block content %}
+<div class="admin-shell">
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-brand">
+      <span class="brand-mark">DA</span>
+      <div>
+        <strong>Dania Amjad</strong>
+        <small>Admin Panel</small>
+      </div>
+    </div>
+    <nav class="admin-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if active=='dashboard' }}"><i class="fa-solid fa-gauge" aria-hidden="true"></i> Dashboard</a>
+      <a href="{{ url_for('admin_profile') }}" class="{{ 'active' if active=='profile' }}"><i class="fa-solid fa-id-card" aria-hidden="true"></i> Profile</a>
+      <a href="{{ url_for('admin_experience') }}" class="{{ 'active' if active=='experience' }}"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> Experience</a>
+      <a href="{{ url_for('admin_companies') }}" class="{{ 'active' if active=='companies' }}"><i class="fa-solid fa-building" aria-hidden="true"></i> Companies</a>
+      <a href="{{ url_for('admin_expertise') }}" class="{{ 'active' if active=='expertise' }}"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Services / Expertise</a>
+      <a href="{{ url_for('admin_achievements') }}" class="{{ 'active' if active=='achievements' }}"><i class="fa-solid fa-award" aria-hidden="true"></i> Achievements</a>
+      <a href="{{ url_for('admin_education') }}" class="{{ 'active' if active=='education' }}"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Education</a>
+      <a href="{{ url_for('admin_skills') }}" class="{{ 'active' if active=='skills' }}"><i class="fa-solid fa-star" aria-hidden="true"></i> Skills</a>
+      <a href="{{ url_for('admin_settings') }}" class="{{ 'active' if active=='settings' }}"><i class="fa-solid fa-gear" aria-hidden="true"></i> Settings</a>
+    </nav>
+    <div class="admin-sidebar-footer">
+      <a href="{{ url_for('index') }}" target="_blank" class="btn-view-live"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> View Live Portfolio</a>
+      <a href="{{ url_for('admin_logout') }}" class="btn-logout"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Logout</a>
+    </div>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="admin-nav-toggle" id="adminNavToggle" aria-label="Toggle menu" aria-controls="adminSidebar" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
+      <h1>{% block admin_title %}Dashboard{% endblock %}</h1>
+      <span class="admin-user"><i class="fa-solid fa-user-circle" aria-hidden="true"></i> {{ session.get('admin_username','') }}</span>
+    </header>
+
+    <div class="admin-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-list">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block admin_content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

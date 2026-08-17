@@ -1,0 +1,139 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'skills' %}
+{% block admin_title %}Skills &amp; Languages{% endblock %}
+{% block admin_content %}
+
+<section class="admin-subsection">
+  <div class="admin-toolbar">
+    <h2 class="section-subtitle">Technical Skills</h2>
+    <button class="btn btn-primary" onclick="openSkillForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Skill</button>
+  </div>
+
+  <div class="form-card" id="skillFormCard" style="display:none;">
+    <h3 id="skillFormTitle">Add Skill</h3>
+    <form method="POST" action="{{ url_for('admin_skills_save') }}" class="admin-form" id="skillForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="id" id="sk_id">
+      <div class="form-grid">
+        <div class="field">
+          <label for="sk_name">Skill Name</label>
+          <input type="text" id="sk_name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="sk_display_order">Display Order</label>
+          <input type="number" id="sk_display_order" name="display_order" value="0">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-ghost" onclick="closeSkillForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-list compact">
+    {% if not skills %}
+    <p class="empty-state">No skills yet.</p>
+    {% endif %}
+    {% for sk in skills %}
+    <div class="admin-list-item">
+      <div class="admin-list-main"><strong>{{ sk.name }}</strong></div>
+      <div class="admin-list-actions">
+        <button class="btn btn-small" onclick='editSkill({{ {"id": sk.id, "name": sk.name, "display_order": sk.display_order} | tojson }})'>Edit</button>
+        <form method="POST" action="{{ url_for('admin_skills_delete', skill_id=sk.id) }}" class="inline-form" onsubmit="return confirm('Delete this skill?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-small btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<hr class="admin-divider">
+
+<section class="admin-subsection">
+  <div class="admin-toolbar">
+    <h2 class="section-subtitle">Languages</h2>
+    <button class="btn btn-primary" onclick="openLangForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Language</button>
+  </div>
+
+  <div class="form-card" id="langFormCard" style="display:none;">
+    <h3 id="langFormTitle">Add Language</h3>
+    <form method="POST" action="{{ url_for('admin_languages_save') }}" class="admin-form" id="langForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="id" id="lg_id">
+      <div class="form-grid">
+        <div class="field">
+          <label for="lg_name">Language</label>
+          <input type="text" id="lg_name" name="name" required>
+        </div>
+        <div class="field">
+          <label for="lg_proficiency">Proficiency</label>
+          <input type="text" id="lg_proficiency" name="proficiency" placeholder="Fluent / Native">
+        </div>
+        <div class="field">
+          <label for="lg_display_order">Display Order</label>
+          <input type="number" id="lg_display_order" name="display_order" value="0">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-ghost" onclick="closeLangForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-list compact">
+    {% if not languages %}
+    <p class="empty-state">No languages yet.</p>
+    {% endif %}
+    {% for l in languages %}
+    <div class="admin-list-item">
+      <div class="admin-list-main"><strong>{{ l.name }}</strong><span>{{ l.proficiency }}</span></div>
+      <div class="admin-list-actions">
+        <button class="btn btn-small" onclick='editLang({{ {"id": l.id, "name": l.name, "proficiency": l.proficiency, "display_order": l.display_order} | tojson }})'>Edit</button>
+        <form method="POST" action="{{ url_for('admin_languages_delete', lang_id=l.id) }}" class="inline-form" onsubmit="return confirm('Delete this language?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-small btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+function openSkillForm(){ document.getElementById('skillFormCard').style.display = 'block'; }
+function closeSkillForm(){
+  document.getElementById('skillFormCard').style.display = 'none';
+  document.getElementById('skillForm').reset();
+  document.getElementById('sk_id').value = '';
+  document.getElementById('skillFormTitle').textContent = 'Add Skill';
+}
+function editSkill(data){
+  document.getElementById('skillFormTitle').textContent = 'Edit Skill';
+  document.getElementById('sk_id').value = data.id;
+  document.getElementById('sk_name').value = data.name || '';
+  document.getElementById('sk_display_order').value = data.display_order || 0;
+  openSkillForm();
+}
+
+function openLangForm(){ document.getElementById('langFormCard').style.display = 'block'; }
+function closeLangForm(){
+  document.getElementById('langFormCard').style.display = 'none';
+  document.getElementById('langForm').reset();
+  document.getElementById('lg_id').value = '';
+  document.getElementById('langFormTitle').textContent = 'Add Language';
+}
+function editLang(data){
+  document.getElementById('langFormTitle').textContent = 'Edit Language';
+  document.getElementById('lg_id').value = data.id;
+  document.getElementById('lg_name').value = data.name || '';
+  document.getElementById('lg_proficiency').value = data.proficiency || '';
+  document.getElementById('lg_display_order').value = data.display_order || 0;
+  openLangForm();
+}
+</script>
+
+{% endblock %}

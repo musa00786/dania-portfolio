@@ -1,0 +1,45 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'dashboard' %}
+{% block admin_title %}Dashboard{% endblock %}
+{% block admin_content %}
+
+<p class="admin-intro">Welcome back. Here's a quick overview of your portfolio content.</p>
+
+<div class="stat-cards">
+  <div class="stat-card">
+    <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+    <div><strong>{{ counts.experiences }}</strong><span>Experiences</span></div>
+  </div>
+  <div class="stat-card">
+    <i class="fa-solid fa-building" aria-hidden="true"></i>
+    <div><strong>{{ counts.companies }}</strong><span>Companies</span></div>
+  </div>
+  <div class="stat-card">
+    <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+    <div><strong>{{ counts.services }}</strong><span>Services</span></div>
+  </div>
+  <div class="stat-card">
+    <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+    <div><strong>{{ counts.statistics }}</strong><span>Impact Statistics</span></div>
+  </div>
+  <div class="stat-card">
+    <i class="fa-solid fa-award" aria-hidden="true"></i>
+    <div><strong>{{ counts.achievements }}</strong><span>Achievements</span></div>
+  </div>
+  <div class="stat-card">
+    <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+    <div><strong>{{ counts.education }}</strong><span>Education Records</span></div>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <h2>Quick Actions</h2>
+  <div class="quick-actions-grid">
+    <a href="{{ url_for('admin_profile') }}" class="quick-action"><i class="fa-solid fa-id-card" aria-hidden="true"></i> Edit Profile</a>
+    <a href="{{ url_for('admin_experience') }}" class="quick-action"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Experience</a>
+    <a href="{{ url_for('admin_companies') }}" class="quick-action"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Company</a>
+    <a href="{{ url_for('index') }}" target="_blank" class="quick-action"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> View Live Portfolio</a>
+  </div>
+</div>
+
+{% endblock %}

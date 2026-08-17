@@ -1,0 +1,91 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'expertise' %}
+{% block admin_title %}Services / Expertise{% endblock %}
+{% block admin_content %}
+
+<p class="admin-intro">Icons use <a href="https://fontawesome.com/search?o=r&m=free&s=solid" target="_blank" rel="noopener noreferrer">Font Awesome</a> solid icon names, e.g. <code>briefcase</code>, <code>search</code>, <code>users</code>.</p>
+
+<div class="admin-toolbar">
+  <button class="btn btn-primary" onclick="openForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Service</button>
+</div>
+
+<div class="form-card" id="formCard" style="display:none;">
+  <h2 id="formTitle">Add Service</h2>
+  <form method="POST" action="{{ url_for('admin_expertise_save') }}" class="admin-form" id="svcForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" id="f_id">
+    <div class="form-grid">
+      <div class="field">
+        <label for="f_title">Title</label>
+        <input type="text" id="f_title" name="title" required>
+      </div>
+      <div class="field">
+        <label for="f_icon">Icon Name</label>
+        <input type="text" id="f_icon" name="icon" placeholder="briefcase">
+      </div>
+      <div class="field">
+        <label for="f_display_order">Display Order</label>
+        <input type="number" id="f_display_order" name="display_order" value="0">
+      </div>
+      <div class="field">
+        <label class="checkbox-inline"><input type="checkbox" id="f_is_active" name="is_active" checked> Active</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f_description">Description</label>
+      <textarea id="f_description" name="description" rows="3"></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <button type="button" class="btn btn-ghost" onclick="closeForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<div class="admin-list">
+  {% if not services %}
+  <p class="empty-state">No services yet. Click "Add Service" to create your first one.</p>
+  {% endif %}
+  {% for s in services %}
+  <div class="admin-list-item">
+    <div class="admin-list-main">
+      <strong><i class="fa-solid fa-{{ s.icon }}" aria-hidden="true"></i> {{ s.title }}</strong>
+      <span>{{ s.description }}</span>
+      {% if not s.is_active %}<span class="badge badge-hidden">Inactive</span>{% endif %}
+    </div>
+    <div class="admin-list-actions">
+      <button class="btn btn-small"
+        onclick='editSvc({{ {"id": s.id, "title": s.title, "description": s.description, "icon": s.icon, "display_order": s.display_order, "is_active": s.is_active} | tojson }})'>Edit</button>
+      <form method="POST" action="{{ url_for('admin_expertise_delete', service_id=s.id) }}" class="inline-form" onsubmit="return confirm('Delete this service? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+function openForm(){
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+}
+function closeForm(){
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('svcForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('formTitle').textContent = 'Add Service';
+}
+function editSvc(data){
+  document.getElementById('formTitle').textContent = 'Edit Service';
+  document.getElementById('f_id').value = data.id;
+  document.getElementById('f_title').value = data.title || '';
+  document.getElementById('f_icon').value = data.icon || '';
+  document.getElementById('f_display_order').value = data.display_order || 0;
+  document.getElementById('f_description').value = data.description || '';
+  document.getElementById('f_is_active').checked = data.is_active === undefined ? true : !!data.is_active;
+  openForm();
+}
+</script>
+
+{% endblock %}

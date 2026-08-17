@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block bodyattrs %} class="public"{% endblock %}
+{% block content %}
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark">DA</span>
+      <span class="brand-text">Dania Amjad</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle navigation menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="primary-nav" id="primaryNav">
+      <a href="#about">About</a>
+      <a href="#what-i-do">What I Do</a>
+      <a href="#experience">Experience</a>
+      <a href="#companies">Companies</a>
+      <a href="#education">Education</a>
+      <a href="#contact" class="nav-cta">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="wrap hero-inner">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Recruitment &amp; Talent Acquisition</p>
+        <h1 class="hero-name">{{ profile.full_name if profile else 'Dania Amjad' }}</h1>
+        <p class="hero-role">{{ profile.title if profile else 'Recruitment Manager' }} &middot; {{ profile.subtitle if profile else 'HR Professional' }}</p>
+        <p class="hero-intro">{{ profile.intro if profile and profile.intro else 'Results-driven HR professional and recruiter with a global perspective, specializing in end-to-end talent acquisition, employer branding, and performance management.' }}</p>
+
+        <ul class="hero-meta">
+          {% if profile and profile.location %}
+          <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ profile.location }}</li>
+          {% endif %}
+          {% if profile and profile.email %}
+          <li><i class="fa-solid fa-envelope" aria-hidden="true"></i> {{ profile.email }}</li>
+          {% endif %}
+          {% if profile and profile.whatsapp %}
+          <li><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> {{ profile.whatsapp }}</li>
+          {% endif %}
+        </ul>
+
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">Contact Me</a>
+          {% if profile and profile.cv_path %}
+          <a href="{{ url_for('download_cv') }}" class="btn btn-outline"><i class="fa-solid fa-download" aria-hidden="true"></i> Download CV</a>
+          {% else %}
+          <span class="btn btn-outline btn-disabled" aria-disabled="true" title="CV coming soon"><i class="fa-solid fa-download" aria-hidden="true"></i> Download CV</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="hero-portrait reveal">
+        <div class="portrait-frame">
+          {% if profile and profile.photo_path %}
+          <img src="{{ url_for('static', filename=profile.photo_path) }}" alt="Portrait of {{ profile.full_name }}" width="440" height="520">
+          {% else %}
+          <div class="portrait-placeholder" role="img" aria-label="Profile photo placeholder">
+            <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+          </div>
+          {% endif %}
+        </div>
+        <div class="portrait-tag">
+          <span class="tag-number">01</span>
+          <span class="tag-label">Source</span>
+        </div>
+        <div class="portrait-tag tag-bottom">
+          <span class="tag-number">04</span>
+          <span class="tag-label">Place</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section about" id="about">
+    <div class="wrap about-grid">
+      <div class="section-heading reveal">
+        <p class="eyebrow">About</p>
+        <h2>Who She Is &amp; What She Does</h2>
+      </div>
+      <div class="about-body reveal">
+        <p class="lede">{{ profile.about_text if profile and profile.about_text else 'Dania Amjad is a results-driven HR professional and recruiter, specializing in end-to-end talent acquisition, employer branding, and performance management.' }}</p>
+
+        {% if profile and profile.industries %}
+        <div class="industries">
+          <p class="industries-label">Industries she works with</p>
+          <ul class="pill-list">
+            {% for ind in profile.industries.split(',') %}
+            <li>{{ ind.strip() }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if stats %}
+    <div class="wrap">
+      <div class="stat-ledger reveal">
+        {% for s in stats %}
+        <div class="stat-item">
+          <span class="stat-number">{{ s.number }}</span>
+          <span class="stat-title">{{ s.title }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- WHAT I DO -->
+  {% if services %}
+  <section class="section services" id="what-i-do">
+    <div class="wrap">
+      <div class="section-heading centered reveal">
+        <p class="eyebrow">What I Do</p>
+        <h2>Recruitment, Done Properly</h2>
+      </div>
+      <div class="services-grid">
+        {% for svc in services %}
+        <div class="service-card reveal">
+          <div class="service-icon"><i class="fa-solid fa-{{ svc.icon }}" aria-hidden="true"></i></div>
+          <h3>{{ svc.title }}</h3>
+          <p>{{ svc.description }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- EXPERIENCE -->
+  {% if experiences %}
+  <section class="section experience" id="experience">
+    <div class="wrap">
+      <div class="section-heading centered reveal">
+        <p class="eyebrow">Career</p>
+        <h2>Work Experience</h2>
+      </div>
+      <div class="timeline">
+        {% for exp in experiences %}
+        <div class="timeline-item reveal">
+          <div class="timeline-marker"></div>
+          <div class="timeline-content">
+            <div class="timeline-top">
+              {% if exp.linked_company_logo %}
+              <img class="timeline-logo" src="{{ url_for('static', filename=exp.linked_company_logo) }}" alt="{{ exp.linked_company_name }} logo">
+              {% endif %}
+              <div>
+                <h3>{{ exp.job_title }}</h3>
+                <p class="timeline-company">{{ exp.linked_company_name or exp.company_name_text }}{% if exp.location %} &middot; {{ exp.location }}{% endif %}</p>
+              </div>
+            </div>
+            <p class="timeline-dates">
+              {{ exp.start_date }} &ndash; {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}
+            </p>
+            {% if exp.description %}<p class="timeline-desc">{{ exp.description }}</p>{% endif %}
+            {% set bullets = exp.bullet_points | nl2list %}
+            {% if bullets %}
+            <ul class="timeline-bullets">
+              {% for b in bullets %}<li>{{ b }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- COMPANIES -->
+  {% if companies %}
+  <section class="section companies" id="companies">
+    <div class="wrap">
+      <div class="section-heading centered reveal">
+        <p class="eyebrow">Trusted By</p>
+        <h2>Companies &amp; Organizations</h2>
+      </div>
+      <div class="company-grid">
+        {% for c in companies %}
+          {% if c.website %}
+          <a class="company-tile reveal" href="{{ c.website }}" target="_blank" rel="noopener noreferrer" title="{{ c.name }}{% if c.description %} — {{ c.description }}{% endif %}">
+            {% if c.logo_path %}
+            <img src="{{ url_for('static', filename=c.logo_path) }}" alt="{{ c.name }} logo" loading="lazy">
+            {% else %}
+            <span class="company-placeholder">{{ c.name }}</span>
+            {% endif %}
+          </a>
+          {% else %}
+          <div class="company-tile reveal" title="{{ c.name }}{% if c.description %} — {{ c.description }}{% endif %}">
+            {% if c.logo_path %}
+            <img src="{{ url_for('static', filename=c.logo_path) }}" alt="{{ c.name }} logo" loading="lazy">
+            {% else %}
+            <span class="company-placeholder">{{ c.name }}</span>
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- EDUCATION -->
+  {% if education %}
+  <section class="section education" id="education">
+    <div class="wrap">
+      <div class="section-heading centered reveal">
+        <p class="eyebrow">Background</p>
+        <h2>Education</h2>
+      </div>
+      <div class="education-grid">
+        {% for edu in education %}
+        <div class="education-card reveal">
+          {% if edu.logo_path %}
+          <img class="education-logo" src="{{ url_for('static', filename=edu.logo_path) }}" alt="{{ edu.institution }} logo">
+          {% else %}
+          <div class="education-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></div>
+          {% endif %}
+          <h3>{{ edu.degree }}</h3>
+          <p class="education-institution">{{ edu.institution }}</p>
+          <p class="education-years">{{ edu.start_year }}{% if edu.end_year %} &ndash; {{ edu.end_year }}{% endif %}</p>
+          {% if edu.description %}<p class="education-desc">{{ edu.description }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- SKILLS / LANGUAGES / ACHIEVEMENTS -->
+  {% if skills or languages or achievements %}
+  <section class="section extras">
+    <div class="wrap extras-grid">
+      {% if skills %}
+      <div class="extras-block reveal">
+        <p class="eyebrow">Technical Skills</p>
+        <ul class="pill-list dark">
+          {% for sk in skills %}<li>{{ sk.name }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if languages %}
+      <div class="extras-block reveal">
+        <p class="eyebrow">Languages</p>
+        <ul class="lang-list">
+          {% for l in languages %}<li><span>{{ l.name }}</span><em>{{ l.proficiency }}</em></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if achievements %}
+      <div class="extras-block reveal">
+        <p class="eyebrow">Awards &amp; Activities</p>
+        <ul class="achievement-list">
+          {% for a in achievements %}
+          <li>
+            <i class="fa-solid fa-{{ a.icon }}" aria-hidden="true"></i>
+            <div><strong>{{ a.title }}</strong>{% if a.description %}<span>{{ a.description }}</span>{% endif %}</div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- CONTACT -->
+  <section class="section contact" id="contact">
+    <div class="wrap contact-inner reveal">
+      <p class="eyebrow light">Get In Touch</p>
+      <h2>Let&rsquo;s Work Together</h2>
+      <p class="contact-sub">Looking to build a high-performing team, or exploring your next opportunity? Let&rsquo;s talk.</p>
+      <div class="contact-links">
+        {% if profile and profile.email %}
+        <a href="mailto:{{ profile.email }}" class="contact-link"><i class="fa-solid fa-envelope" aria-hidden="true"></i> {{ profile.email }}</a>
+        {% endif %}
+        {% if profile and profile.whatsapp %}
+        <a href="https://wa.me/{{ profile.whatsapp | replace('+','') | replace(' ','') }}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> WhatsApp</a>
+        {% endif %}
+        {% if profile and profile.linkedin %}
+        <a href="{{ profile.linkedin }}" class="contact-link" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin" aria-hidden="true"></i> LinkedIn</a>
+        {% endif %}
+        {% if profile and profile.location %}
+        <span class="contact-link static"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ profile.location }}</span>
+        {% endif %}
+      </div>
+      {% if profile and profile.email %}
+      <a href="mailto:{{ profile.email }}" class="btn btn-gold">Start a Conversation</a>
+      {% endif %}
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>&copy; {{ current_year }} {{ profile.full_name if profile else 'Dania Amjad' }}. All rights reserved.</span>
+    <a href="{{ url_for('admin_login') }}" class="footer-admin">Admin</a>
+  </div>
+</footer>
+
+{% endblock %}

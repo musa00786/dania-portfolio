@@ -1,0 +1,108 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'profile' %}
+{% block admin_title %}Profile{% endblock %}
+{% block admin_content %}
+
+<form method="POST" action="{{ url_for('admin_profile') }}" enctype="multipart/form-data" class="admin-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="form-card">
+    <h2>Profile Photo</h2>
+    <div class="photo-manager">
+      <div class="photo-preview">
+        {% if profile and profile.photo_path %}
+        <img src="{{ url_for('static', filename=profile.photo_path) }}" alt="Current profile photo">
+        {% else %}
+        <div class="photo-placeholder"><i class="fa-solid fa-user-tie" aria-hidden="true"></i></div>
+        {% endif %}
+      </div>
+      <div class="photo-actions">
+        <label class="btn btn-outline file-btn">
+          <i class="fa-solid fa-upload" aria-hidden="true"></i> Upload Photo
+          <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp">
+        </label>
+        {% if profile and profile.photo_path %}
+        <label class="checkbox-inline">
+          <input type="checkbox" name="delete_photo" value="1"> Remove current photo
+        </label>
+        {% endif %}
+        <p class="field-hint">JPG, PNG or WebP. Recommended square or portrait ratio. Auto-resized on upload.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h2>Basic Information</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" value="{{ profile.full_name if profile else '' }}" required>
+      </div>
+      <div class="field">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" value="{{ profile.title if profile else '' }}" placeholder="Recruitment Manager">
+      </div>
+      <div class="field">
+        <label for="subtitle">Subtitle</label>
+        <input type="text" id="subtitle" name="subtitle" value="{{ profile.subtitle if profile else '' }}" placeholder="HR Professional">
+      </div>
+      <div class="field">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" value="{{ profile.location if profile else '' }}" placeholder="City, Country">
+      </div>
+    </div>
+    <div class="field">
+      <label for="intro">Hero Introduction</label>
+      <textarea id="intro" name="intro" rows="3">{{ profile.intro if profile else '' }}</textarea>
+    </div>
+    <div class="field">
+      <label for="about_text">About Me (full text)</label>
+      <textarea id="about_text" name="about_text" rows="5">{{ profile.about_text if profile else '' }}</textarea>
+    </div>
+    <div class="field">
+      <label for="industries">Industries (comma-separated)</label>
+      <input type="text" id="industries" name="industries" value="{{ profile.industries if profile else '' }}" placeholder="Healthcare, IT, Hospitality">
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h2>Contact Details</h2>
+    <div class="form-grid">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ profile.email if profile else '' }}">
+      </div>
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" value="{{ profile.phone if profile else '' }}">
+      </div>
+      <div class="field">
+        <label for="whatsapp">WhatsApp (with country code, no + or spaces)</label>
+        <input type="text" id="whatsapp" name="whatsapp" value="{{ profile.whatsapp if profile else '' }}" placeholder="9230000000">
+      </div>
+      <div class="field">
+        <label for="linkedin">LinkedIn URL</label>
+        <input type="url" id="linkedin" name="linkedin" value="{{ profile.linkedin if profile else '' }}" placeholder="https://linkedin.com/in/...">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h2>CV / Resume</h2>
+    {% if profile and profile.cv_path %}
+    <p class="field-hint">Current file: <a href="{{ url_for('download_cv') }}" target="_blank">Download current CV</a></p>
+    {% else %}
+    <p class="field-hint">No CV uploaded yet.</p>
+    {% endif %}
+    <label class="btn btn-outline file-btn">
+      <i class="fa-solid fa-upload" aria-hidden="true"></i> Upload / Replace CV (PDF)
+      <input type="file" name="cv" accept=".pdf">
+    </label>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+  </div>
+</form>
+
+{% endblock %}

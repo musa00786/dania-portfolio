@@ -1,0 +1,123 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'experience' %}
+{% block admin_title %}Experience{% endblock %}
+{% block admin_content %}
+
+<div class="admin-toolbar">
+  <button class="btn btn-primary" id="btnAddNew" onclick="openForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Experience</button>
+</div>
+
+<div class="form-card" id="formCard" style="display:none;">
+  <h2 id="formTitle">Add Experience</h2>
+  <form method="POST" action="{{ url_for('admin_experience_save') }}" class="admin-form" id="expForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" id="f_id">
+    <div class="form-grid">
+      <div class="field">
+        <label for="f_job_title">Job Title</label>
+        <input type="text" id="f_job_title" name="job_title" required>
+      </div>
+      <div class="field">
+        <label for="f_company_id">Linked Company (optional)</label>
+        <select id="f_company_id" name="company_id">
+          <option value="">— None / use text below —</option>
+          {% for c in companies %}
+          <option value="{{ c.id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f_company_name_text">Company Name (if not linked)</label>
+        <input type="text" id="f_company_name_text" name="company_name_text">
+      </div>
+      <div class="field">
+        <label for="f_location">Location</label>
+        <input type="text" id="f_location" name="location">
+      </div>
+      <div class="field">
+        <label for="f_start_date">Start Date</label>
+        <input type="text" id="f_start_date" name="start_date" placeholder="Jan 2022">
+      </div>
+      <div class="field">
+        <label for="f_end_date">End Date</label>
+        <input type="text" id="f_end_date" name="end_date" placeholder="Dec 2023">
+      </div>
+      <div class="field">
+        <label class="checkbox-inline"><input type="checkbox" id="f_is_current" name="is_current"> Current Position</label>
+      </div>
+      <div class="field">
+        <label for="f_display_order">Display Order</label>
+        <input type="number" id="f_display_order" name="display_order" value="0">
+      </div>
+    </div>
+    <div class="field">
+      <label for="f_description">Description</label>
+      <textarea id="f_description" name="description" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label for="f_bullet_points">Bullet Points (one per line)</label>
+      <textarea id="f_bullet_points" name="bullet_points" rows="4" placeholder="Led sourcing strategy for...&#10;Reduced time-to-hire by..."></textarea>
+    </div>
+    <div class="field">
+      <label class="checkbox-inline"><input type="checkbox" id="f_is_visible" name="is_visible" checked> Visible on public site</label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <button type="button" class="btn btn-ghost" onclick="closeForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<div class="admin-list">
+  {% if not experiences %}
+  <p class="empty-state">No experience records yet. Click "Add Experience" to create your first one.</p>
+  {% endif %}
+  {% for e in experiences %}
+  <div class="admin-list-item">
+    <div class="admin-list-main">
+      <strong>{{ e.job_title }}</strong>
+      <span>{{ e.linked_company_name or e.company_name_text }} &middot; {{ e.start_date }} &ndash; {{ 'Present' if e.is_current else e.end_date }}</span>
+      {% if not e.is_visible %}<span class="badge badge-hidden">Hidden</span>{% endif %}
+    </div>
+    <div class="admin-list-actions">
+      <button class="btn btn-small"
+        onclick='editExp({{ {"id": e.id, "job_title": e.job_title, "company_id": e.company_id, "company_name_text": e.company_name_text, "location": e.location, "start_date": e.start_date, "end_date": e.end_date, "is_current": e.is_current, "display_order": e.display_order, "description": e.description, "bullet_points": e.bullet_points, "is_visible": e.is_visible} | tojson }})'>Edit</button>
+      <form method="POST" action="{{ url_for('admin_experience_delete', exp_id=e.id) }}" class="inline-form" onsubmit="return confirm('Delete this experience? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+function openForm(){
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+}
+function closeForm(){
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('expForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('formTitle').textContent = 'Add Experience';
+}
+function editExp(data){
+  document.getElementById('formTitle').textContent = 'Edit Experience';
+  document.getElementById('f_id').value = data.id;
+  document.getElementById('f_job_title').value = data.job_title || '';
+  document.getElementById('f_company_id').value = data.company_id || '';
+  document.getElementById('f_company_name_text').value = data.company_name_text || '';
+  document.getElementById('f_location').value = data.location || '';
+  document.getElementById('f_start_date').value = data.start_date || '';
+  document.getElementById('f_end_date').value = data.end_date || '';
+  document.getElementById('f_is_current').checked = !!data.is_current;
+  document.getElementById('f_display_order').value = data.display_order || 0;
+  document.getElementById('f_description').value = data.description || '';
+  document.getElementById('f_bullet_points').value = data.bullet_points || '';
+  document.getElementById('f_is_visible').checked = data.is_visible === undefined ? true : !!data.is_visible;
+  openForm();
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Admin Login | Dania Amjad{% endblock %}
+{% block bodyattrs %} class="login-page"{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">
+      <span class="brand-mark">DA</span>
+      <p>Dania Amjad &middot; Admin</p>
+    </div>
+    <h1>Sign in</h1>
+    <p class="login-sub">Manage your portfolio content.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-list">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('admin_login') }}" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required autofocus autocomplete="username">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required autocomplete="current-password">
+
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="login-back">&larr; Back to portfolio</a>
+  </div>
+</div>
+{% endblock %}

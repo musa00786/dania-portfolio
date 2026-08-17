@@ -1,0 +1,107 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'education' %}
+{% block admin_title %}Education{% endblock %}
+{% block admin_content %}
+
+<div class="admin-toolbar">
+  <button class="btn btn-primary" onclick="openForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Education</button>
+</div>
+
+<div class="form-card" id="formCard" style="display:none;">
+  <h2 id="formTitle">Add Education</h2>
+  <form method="POST" action="{{ url_for('admin_education_save') }}" enctype="multipart/form-data" class="admin-form" id="eduForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" id="f_id">
+    <div class="form-grid">
+      <div class="field">
+        <label for="f_degree">Degree</label>
+        <input type="text" id="f_degree" name="degree" required>
+      </div>
+      <div class="field">
+        <label for="f_institution">Institution</label>
+        <input type="text" id="f_institution" name="institution">
+      </div>
+      <div class="field">
+        <label for="f_start_year">Start Year</label>
+        <input type="text" id="f_start_year" name="start_year" placeholder="2016">
+      </div>
+      <div class="field">
+        <label for="f_end_year">End Year</label>
+        <input type="text" id="f_end_year" name="end_year" placeholder="2020">
+      </div>
+      <div class="field">
+        <label for="f_display_order">Display Order</label>
+        <input type="number" id="f_display_order" name="display_order" value="0">
+      </div>
+    </div>
+    <div class="field">
+      <label for="f_description">Description</label>
+      <textarea id="f_description" name="description" rows="2"></textarea>
+    </div>
+    <div class="field">
+      <label class="btn btn-outline file-btn">
+        <i class="fa-solid fa-upload" aria-hidden="true"></i> Upload Logo / Icon
+        <input type="file" name="logo" accept=".jpg,.jpeg,.png,.webp,.svg">
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <button type="button" class="btn btn-ghost" onclick="closeForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<div class="admin-list">
+  {% if not education %}
+  <p class="empty-state">No education records yet. Click "Add Education" to create your first one.</p>
+  {% endif %}
+  {% for edu in education %}
+  <div class="admin-list-item">
+    <div class="admin-list-main logo-row">
+      {% if edu.logo_path %}
+      <img class="mini-logo" src="{{ url_for('static', filename=edu.logo_path) }}" alt="{{ edu.institution }} logo">
+      {% else %}
+      <span class="mini-logo mini-logo-placeholder"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span>
+      {% endif %}
+      <div>
+        <strong>{{ edu.degree }}</strong>
+        <span>{{ edu.institution }} &middot; {{ edu.start_year }}{% if edu.end_year %} &ndash; {{ edu.end_year }}{% endif %}</span>
+      </div>
+    </div>
+    <div class="admin-list-actions">
+      <button class="btn btn-small"
+        onclick='editEdu({{ {"id": edu.id, "degree": edu.degree, "institution": edu.institution, "start_year": edu.start_year, "end_year": edu.end_year, "description": edu.description, "display_order": edu.display_order} | tojson }})'>Edit</button>
+      <form method="POST" action="{{ url_for('admin_education_delete', edu_id=edu.id) }}" class="inline-form" onsubmit="return confirm('Delete this education record? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+function openForm(){
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+}
+function closeForm(){
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('eduForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('formTitle').textContent = 'Add Education';
+}
+function editEdu(data){
+  document.getElementById('formTitle').textContent = 'Edit Education';
+  document.getElementById('f_id').value = data.id;
+  document.getElementById('f_degree').value = data.degree || '';
+  document.getElementById('f_institution').value = data.institution || '';
+  document.getElementById('f_start_year').value = data.start_year || '';
+  document.getElementById('f_end_year').value = data.end_year || '';
+  document.getElementById('f_display_order').value = data.display_order || 0;
+  document.getElementById('f_description').value = data.description || '';
+  openForm();
+}
+</script>
+
+{% endblock %}

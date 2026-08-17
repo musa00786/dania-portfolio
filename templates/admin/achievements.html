@@ -1,0 +1,163 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'achievements' %}
+{% block admin_title %}Achievements{% endblock %}
+{% block admin_content %}
+
+<section class="admin-subsection">
+  <div class="admin-toolbar">
+    <h2 class="section-subtitle">Impact Statistics</h2>
+    <button class="btn btn-primary" onclick="openStatForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Statistic</button>
+  </div>
+  <p class="admin-intro">These power the highlighted numbers on the public "About" section (e.g. "1,000+ Blue-Collar Professionals Placed").</p>
+
+  <div class="form-card" id="statFormCard" style="display:none;">
+    <h3 id="statFormTitle">Add Statistic</h3>
+    <form method="POST" action="{{ url_for('admin_statistics_save') }}" class="admin-form" id="statForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="id" id="s_id">
+      <div class="form-grid">
+        <div class="field">
+          <label for="s_number">Number</label>
+          <input type="text" id="s_number" name="number" placeholder="1,000+" required>
+        </div>
+        <div class="field">
+          <label for="s_title">Title</label>
+          <input type="text" id="s_title" name="title" placeholder="Blue-Collar Professionals Placed" required>
+        </div>
+        <div class="field">
+          <label for="s_icon">Icon Name</label>
+          <input type="text" id="s_icon" name="icon" placeholder="hard-hat">
+        </div>
+        <div class="field">
+          <label for="s_display_order">Display Order</label>
+          <input type="number" id="s_display_order" name="display_order" value="0">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-ghost" onclick="closeStatForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-list">
+    {% if not stats %}
+    <p class="empty-state">No statistics yet. Click "Add Statistic" to create your first one.</p>
+    {% endif %}
+    {% for s in stats %}
+    <div class="admin-list-item">
+      <div class="admin-list-main">
+        <strong>{{ s.number }}</strong>
+        <span>{{ s.title }}</span>
+      </div>
+      <div class="admin-list-actions">
+        <button class="btn btn-small"
+          onclick='editStat({{ {"id": s.id, "number": s.number, "title": s.title, "icon": s.icon, "display_order": s.display_order} | tojson }})'>Edit</button>
+        <form method="POST" action="{{ url_for('admin_statistics_delete', stat_id=s.id) }}" class="inline-form" onsubmit="return confirm('Delete this statistic?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-small btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<hr class="admin-divider">
+
+<section class="admin-subsection">
+  <div class="admin-toolbar">
+    <h2 class="section-subtitle">Awards &amp; Activities</h2>
+    <button class="btn btn-primary" onclick="openAchForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Achievement</button>
+  </div>
+
+  <div class="form-card" id="achFormCard" style="display:none;">
+    <h3 id="achFormTitle">Add Achievement</h3>
+    <form method="POST" action="{{ url_for('admin_achievement_save') }}" class="admin-form" id="achForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="id" id="a_id">
+      <div class="form-grid">
+        <div class="field">
+          <label for="a_title">Title</label>
+          <input type="text" id="a_title" name="title" required>
+        </div>
+        <div class="field">
+          <label for="a_icon">Icon Name</label>
+          <input type="text" id="a_icon" name="icon" placeholder="award">
+        </div>
+        <div class="field">
+          <label for="a_display_order">Display Order</label>
+          <input type="number" id="a_display_order" name="display_order" value="0">
+        </div>
+      </div>
+      <div class="field">
+        <label for="a_description">Description</label>
+        <textarea id="a_description" name="description" rows="2"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-ghost" onclick="closeAchForm()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="admin-list">
+    {% if not achievements %}
+    <p class="empty-state">No achievements yet. Click "Add Achievement" to create your first one.</p>
+    {% endif %}
+    {% for a in achievements %}
+    <div class="admin-list-item">
+      <div class="admin-list-main">
+        <strong>{{ a.title }}</strong>
+        <span>{{ a.description }}</span>
+      </div>
+      <div class="admin-list-actions">
+        <button class="btn btn-small"
+          onclick='editAch({{ {"id": a.id, "title": a.title, "description": a.description, "icon": a.icon, "display_order": a.display_order} | tojson }})'>Edit</button>
+        <form method="POST" action="{{ url_for('admin_achievement_delete', item_id=a.id) }}" class="inline-form" onsubmit="return confirm('Delete this achievement?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-small btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+function openStatForm(){ document.getElementById('statFormCard').style.display = 'block'; }
+function closeStatForm(){
+  document.getElementById('statFormCard').style.display = 'none';
+  document.getElementById('statForm').reset();
+  document.getElementById('s_id').value = '';
+  document.getElementById('statFormTitle').textContent = 'Add Statistic';
+}
+function editStat(data){
+  document.getElementById('statFormTitle').textContent = 'Edit Statistic';
+  document.getElementById('s_id').value = data.id;
+  document.getElementById('s_number').value = data.number || '';
+  document.getElementById('s_title').value = data.title || '';
+  document.getElementById('s_icon').value = data.icon || '';
+  document.getElementById('s_display_order').value = data.display_order || 0;
+  openStatForm();
+}
+
+function openAchForm(){ document.getElementById('achFormCard').style.display = 'block'; }
+function closeAchForm(){
+  document.getElementById('achFormCard').style.display = 'none';
+  document.getElementById('achForm').reset();
+  document.getElementById('a_id').value = '';
+  document.getElementById('achFormTitle').textContent = 'Add Achievement';
+}
+function editAch(data){
+  document.getElementById('achFormTitle').textContent = 'Edit Achievement';
+  document.getElementById('a_id').value = data.id;
+  document.getElementById('a_title').value = data.title || '';
+  document.getElementById('a_icon').value = data.icon || '';
+  document.getElementById('a_display_order').value = data.display_order || 0;
+  document.getElementById('a_description').value = data.description || '';
+  openAchForm();
+}
+</script>
+
+{% endblock %}

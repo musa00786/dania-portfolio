@@ -1,0 +1,103 @@
+{% extends "admin/admin_base.html" %}
+{% set active = 'companies' %}
+{% block admin_title %}Companies{% endblock %}
+{% block admin_content %}
+
+<div class="admin-toolbar">
+  <button class="btn btn-primary" onclick="openForm()"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Company</button>
+</div>
+
+<div class="form-card" id="formCard" style="display:none;">
+  <h2 id="formTitle">Add Company</h2>
+  <form method="POST" action="{{ url_for('admin_companies_save') }}" enctype="multipart/form-data" class="admin-form" id="companyForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="id" id="f_id">
+    <div class="form-grid">
+      <div class="field">
+        <label for="f_name">Company Name</label>
+        <input type="text" id="f_name" name="name" required>
+      </div>
+      <div class="field">
+        <label for="f_website">Website URL</label>
+        <input type="url" id="f_website" name="website" placeholder="https://">
+      </div>
+      <div class="field">
+        <label for="f_display_order">Display Order</label>
+        <input type="number" id="f_display_order" name="display_order" value="0">
+      </div>
+      <div class="field">
+        <label class="checkbox-inline"><input type="checkbox" id="f_is_visible" name="is_visible" checked> Visible on public site</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f_description">Short Description</label>
+      <textarea id="f_description" name="description" rows="2"></textarea>
+    </div>
+    <div class="field">
+      <label class="btn btn-outline file-btn">
+        <i class="fa-solid fa-upload" aria-hidden="true"></i> Upload Logo
+        <input type="file" name="logo" accept=".jpg,.jpeg,.png,.webp,.svg">
+      </label>
+      <p class="field-hint">PNG, JPG, WebP or SVG. Aspect ratio is preserved automatically.</p>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <button type="button" class="btn btn-ghost" onclick="closeForm()">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<div class="admin-list">
+  {% if not companies %}
+  <p class="empty-state">No companies added yet. Click "Add Company" to create your first one.</p>
+  {% endif %}
+  {% for c in companies %}
+  <div class="admin-list-item">
+    <div class="admin-list-main logo-row">
+      {% if c.logo_path %}
+      <img class="mini-logo" src="{{ url_for('static', filename=c.logo_path) }}" alt="{{ c.name }} logo">
+      {% else %}
+      <span class="mini-logo mini-logo-placeholder"><i class="fa-solid fa-building" aria-hidden="true"></i></span>
+      {% endif %}
+      <div>
+        <strong>{{ c.name }}</strong>
+        {% if c.website %}<span>{{ c.website }}</span>{% endif %}
+        {% if not c.is_visible %}<span class="badge badge-hidden">Hidden</span>{% endif %}
+      </div>
+    </div>
+    <div class="admin-list-actions">
+      <button class="btn btn-small"
+        onclick='editCompany({{ {"id": c.id, "name": c.name, "website": c.website, "description": c.description, "display_order": c.display_order, "is_visible": c.is_visible} | tojson }})'>Edit</button>
+      <form method="POST" action="{{ url_for('admin_companies_delete', company_id=c.id) }}" class="inline-form" onsubmit="return confirm('Delete this company? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+function openForm(){
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('formCard').scrollIntoView({behavior:'smooth'});
+}
+function closeForm(){
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('companyForm').reset();
+  document.getElementById('f_id').value = '';
+  document.getElementById('formTitle').textContent = 'Add Company';
+}
+function editCompany(data){
+  document.getElementById('formTitle').textContent = 'Edit Company';
+  document.getElementById('f_id').value = data.id;
+  document.getElementById('f_name').value = data.name || '';
+  document.getElementById('f_website').value = data.website || '';
+  document.getElementById('f_display_order').value = data.display_order || 0;
+  document.getElementById('f_description').value = data.description || '';
+  document.getElementById('f_is_visible').checked = data.is_visible === undefined ? true : !!data.is_visible;
+  openForm();
+}
+</script>
+
+{% endblock %}
